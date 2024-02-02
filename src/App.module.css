@@ -1,0 +1,39 @@
+
+
+nav {
+  /* border: 1px solid pink; */
+  /* inline-size: 200px; */
+  block-size: 30px;
+  margin: 0 auto;
+  display: flex;
+  gap: 3px;
+  justify-content: center;
+  align-items: center;
+  margin-block: 20px;
+
+  .sortLabel {
+    background-color: pink;
+    inline-size: 65px;
+    block-size: 100%;
+    user-select: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    font-size: 0.9rem;
+  }
+
+  input[type="checkbox"] {
+    display: none;
+  }
+  
+  
+  
+  input[type="checkbox"]:checked+.sortLabel {
+    background-color: hotpink;
+    color: #222;
+  }
+
+}
+
+

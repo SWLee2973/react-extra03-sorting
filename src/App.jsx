@@ -1,41 +1,111 @@
 import { useState, useEffect } from 'react'
 import { Product } from './components'
+import classes from './App.module.css';
 
-const API = import.meta.env.VITE_PB_URL;
+const API = import.meta.env.VITE_PB_URL
 
-async function fetchProducts(options) {
+async function fetchProducts(options, sort) {
   try{
-    const response = await fetch(`${API}/api/collections/products/records?page=1&perPage=5`, options);
+    const fetchURL = `${API}/api/collections/products/records?page=2&perPage=8&sort=${sort.join('%2C')}`
+    const response = await fetch(fetchURL, options);
     const data = await response.json();
-
-    console.log(data);
 
     return data;
   } catch (error) {
     throw new Error(error)
   }
+}
 
+const PRODUCTS_INITIAL_STATE = {
+  productData: [],
+  sort: [],
+};
+
+function SortChecker({
+  id, children, value, ...props
+}) {
+  return (
+    <>
+      <input 
+        type="checkbox" 
+        id={id} 
+        value={value}
+        {...props} />
+      <label 
+        className={classes.sortLabel} 
+        htmlFor={id}
+      >
+        {children}
+      </label>
+    </>
+  )
 }
 
 function App() {
-  const [productData, setProductData] = useState([]);
+  const [products, setProducts] = useState(PRODUCTS_INITIAL_STATE);
 
-  // 최초 한번만 데이터 호출해서 렌더링
   useEffect(() => {
     const controller = new AbortController();
 
-    fetchProducts({ signal: controller.signal })
+    fetchProducts({ signal: controller.signal }, products.sort)
       .then(data => {
-        setProductData(data?.items);
+        setProducts({
+          productData: data?.items,
+          sort: products.sort
+        });
       })
-  }, [])
+  }, [products.sort])
+
+  const handleCheck = (e) => {
+    const { value, checked } = e.target;
+    setProducts({
+      ...products,
+      sort: checked ? [...products.sort, value] 
+                    : products.sort.filter(s => s != value)
+    })
+  }
 
   return (
-    <ul>
-      {productData.map(product => {
-        return <Product key={product.id} {...product}/>
-      })}
-    </ul>
+    <>
+      <nav>
+        <SortChecker
+          onChange={handleCheck}
+          id='product_name'
+          value='product_name'
+          checked={products.sort.includes('product_name')}
+        >
+          이름순
+        </SortChecker>
+        <SortChecker
+          onChange={handleCheck}
+          id='-created'
+          value='-created'
+          checked={products.sort.includes('-created')}
+        >
+          신상품순
+        </SortChecker>
+        <SortChecker
+          onChange={handleCheck}
+          id='price'
+          value='price'
+          checked={products.sort.includes('price')}
+        >
+          가격순
+        </SortChecker>
+      </nav>
+      <ul style={{
+        inlineSize: '1050px',
+        margin: '0 auto',
+        display: 'flex',
+        gap: '8px',
+        flexWrap: 'wrap',
+
+      }}>
+        {products.productData.map(product => {
+          return <Product key={product.id} {...product}/>
+        })}
+      </ul>
+    </>
   )
 }
 

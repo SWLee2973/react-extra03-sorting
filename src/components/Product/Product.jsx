@@ -1,4 +1,3 @@
-import React from 'react';
 import classes from './Product.module.css';
 
 const getProductImageURL = ( product) => {
