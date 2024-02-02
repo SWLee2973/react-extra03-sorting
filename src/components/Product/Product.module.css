@@ -1,0 +1,80 @@
+.product {
+  max-inline-size: 250px;
+  inline-size: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-block-end: 20px;
+  text-align: start;
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .thumbnail {
+    position: relative;
+    inline-size: 250px;
+    block-size: 320px;
+    margin: 0;
+    display: block;
+    overflow: hidden;
+    
+    img {
+      inline-size: 100%;
+      block-size: 100%;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .cart {
+      position: absolute;
+      bottom: 5%;
+      right: 5%;
+      background-repeat: no-repeat;
+      background-image: url('/cart.svg');
+      width: 45px;
+      height: 45px;
+    }
+  }
+
+  .brand_id {
+    color: rgba(137, 137, 137, 1);
+    font-size: 0.75rem;
+  }
+
+  .discount-rate {
+    color: rgba(250, 98, 47, 1);
+    font-size: 1.33rem;
+    margin-inline-end: 8px;
+  }
+
+  .real-price {
+    font-size: 1.33rem;
+    font-weight: bold;
+  }
+
+  .regular-price {
+    text-decoration: line-through;
+  }
+
+  .description {
+    font-size: 0.75rem;
+  }
+
+  .keyword {
+    background-color: rgba(225, 225, 225, 1);
+    padding: 4px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+
+    &.only {
+      color: rgba(95, 0, 128, 1);
+      font-weight: bold;
+    }
+  }
+
+}
