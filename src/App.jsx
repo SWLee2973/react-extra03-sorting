@@ -12,7 +12,7 @@ async function fetchProducts(options, sort) {
 
     return data;
   } catch (error) {
-    throw new Error(error)
+    throw new Error(error);
   }
 }
 
@@ -54,6 +54,8 @@ function App() {
           sort: products.sort
         });
       })
+
+    return () => controller.abort();
   }, [products.sort])
 
   const handleCheck = (e) => {
