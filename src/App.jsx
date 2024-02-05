@@ -1,22 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Product } from './components'
 import classes from './App.module.css';
-
-const API = import.meta.env.VITE_PB_URL
-
-async function fetchProducts(options, sort, page) {
-  try{
-    const fetchURL = `${API}/api/collections/products/records?page=${page}&perPage=8&sort=${sort.join('%2C')}`
-    const response = await fetch(fetchURL, options);
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    if(!(error instanceof DOMException)) {
-      throw new Error(error);
-    }
-  }
-}
+import { useIntersectionObserver, useAddProductData, useSortProductData } from './hook';
 
 const PRODUCTS_INITIAL_STATE = {
   productData: [],
@@ -48,26 +33,13 @@ function SortChecker({
 function App() {
   const [products, setProducts] = useState(PRODUCTS_INITIAL_STATE);
 
-  const callback = () => {
+  const setPage = () => {
     setProducts(products => {
       return {...products, page: products.page + 1}
     })
   }
 
-  const options = { threshold: 1 };
-  const callbackFn = (entries) => {
-    entries.forEach(entry => {
-      if(entry.isIntersecting) {
-        callback();
-      }
-    });
-  }
-
-  const observer = useRef(new IntersectionObserver(callbackFn, options));
-
-  const observe = item => observer.current.observe(item);
-  const unobserve = item => observer.current.unobserve(item);
-
+  const [observe, unobserve] = useIntersectionObserver(setPage);
   const observeTarget = useRef(null);
 
   useEffect(() => {
@@ -81,39 +53,9 @@ function App() {
     }
   }, [products.productData])
 
-  // 
-  useEffect(() => {
-    const controller = new AbortController();
+  useAddProductData(products, setProducts);
+  useSortProductData(products, setProducts);
 
-    fetchProducts({ signal: controller.signal }, products.sort, products.page)
-      .then(data => {
-        setProducts({
-          ...products,
-          productData: data?.items,
-          sort: products.sort,
-          totalItems: data?.totalItems,
-        });
-      })
-      
-      return () => controller.abort();
-  }, [products.sort])
-
-  //
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetchProducts({ signal: controller.signal }, products.sort, products.page)
-      .then(data => {
-        setProducts({
-          ...products,
-          productData: [...products.productData, ...data.items],
-          sort: products.sort,
-          totalItems: data?.totalItems,
-        });
-      })
-      
-      return () => controller.abort();
-  }, [products.page])    
     
   const handleCheck = (e) => {
     const { value, checked } = e.target;
